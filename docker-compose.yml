@@ -1,0 +1,44 @@
+---
+services:
+  syncthing:
+    image: syncthing/syncthing
+    container_name: syncthing
+    hostname: my-syncthing
+    ports:
+      - 6464:8384
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ./.st:/var/syncthing
+    # network_mode: host
+    restart: unless-stopped
+
+  calibre:
+    image: lscr.io/linuxserver/calibre:latest
+    container_name: calibre
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - PASSWORD=${C_PASS}
+      - CUSTOM_USER=${C_USER}
+    volumes:
+      - ${C_DIR}:/config
+    ports:
+      - 6465:8080
+      - 8181:8181
+      - 8081:8081
+    restart: unless-stopped
+
+  filebrowser:
+    container_name: filebrowser
+    image: filebrowser/filebrowser
+    volumes:
+      - ./test_folder:/srv
+      - ./.fb/filebrowser.db:/database/filebrowser.db
+    ports:
+      - "6466:80"
+    environment:
+      - PUID=${PUID} # Use environment variable syntax
+      - PGID=${PGID} # Use environment variable syntax
