@@ -2,4 +2,6 @@
 .fb/
 .st/
 test_folder/
+test_download/
 .env
+.deluge/

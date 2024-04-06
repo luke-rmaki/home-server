@@ -1,8 +1,8 @@
 # PI Config
 - [x] Syncthing 
 - [x] Calibre
-- [ ] Deluge
-- [ ] File Browser
+- [x] Deluge
+- [x] File Browser
 - [ ] Caddy
 
 
