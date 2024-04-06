@@ -60,3 +60,9 @@ services:
       - 6881:6881/udp
       - 58846:58846 #optional
     restart: unless-stopped
+
+  caddy:
+    build: .
+    container_name: caddy
+    ports:
+      - 2016:2016
