@@ -62,25 +62,24 @@ services:
     image: caddy:2.8.4
     container_name: caddy
     restart: unless-stopped
-    # ports:
-    # - 6999:2016
-    # - "80:80"
-    # - "443:443"
-    # - "443:443/udp"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-    network_mode: service:vpn
-    depends_on:
-      - vpn
-
-  vpn:
-    image: ghcr.io/bubuntux/nordlynx
-    container_name: vpn
     ports:
       - "80:80"
       - "443:443"
       - "443:443/udp"
-    cap_add:
-      - NET_ADMIN #required
-    environment:
-      - PRIVATE_KEY=${PK}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+  #   network_mode: service:vpn
+  #   depends_on:
+  #     - vpn
+
+  # vpn:
+  #   image: ghcr.io/bubuntux/nordlynx
+  #   container_name: vpn
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #     - "443:443/udp"
+  #   cap_add:
+  #     - NET_ADMIN #required
+  #   environment:
+  #     - PRIVATE_KEY=${PK}
