@@ -5,14 +5,17 @@ services:
     container_name: syncthing
     hostname: my-syncthing
     ports:
-      - 6464:8384
+      - 6464:8385
     environment:
       - PUID=1000
       - PGID=1000
+      - STGUIADDRESS=0.0.0.0:8385
     volumes:
       - ./.st:/var/syncthing
     # network_mode: host
     restart: unless-stopped
+    # networks:
+    #   - tunnel
 
   calibre:
     image: lscr.io/linuxserver/calibre:latest
@@ -39,9 +42,6 @@ services:
       - ./.fb/filebrowser.db:/database/filebrowser.db
     ports:
       - "6466:80"
-    environment:
-      - PUID=${PUID} # Use environment variable syntax
-      - PGID=${PGID} # Use environment variable syntax
 
   deluge:
     image: lscr.io/linuxserver/deluge:latest
@@ -60,9 +60,3 @@ services:
       - 6881:6881/udp
       - 58846:58846 #optional
     restart: unless-stopped
-
-  caddy:
-    build: .
-    container_name: caddy
-    ports:
-      - 2016:2016
