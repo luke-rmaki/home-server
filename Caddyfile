@@ -1,3 +1,6 @@
+# :2016 {
+#   reverse_proxy syncthing:8385
+# }
 
 sync.rmaki.tech {
   reverse_proxy syncthing:8385

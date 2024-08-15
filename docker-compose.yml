@@ -63,9 +63,10 @@ services:
     container_name: caddy
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
+      - 2016:2016
+      # - "80:80"
+      # - "443:443"
+      # - "443:443/udp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
   #   network_mode: service:vpn
