@@ -3,17 +3,17 @@
 # }
 
 sync.rmaki.tech {
-  reverse_proxy syncthing:8385
+  reverse_proxy localhost:6464
 }
 
 lib.rmaki.tech {
-  reverse_proxy calibre:8181
+  reverse_proxy localhost:6465
 }
 
 files.rmaki.tech {
-  reverse_proxy filebrowser:80
+  reverse_proxy localhost:6466
 }
 
 torr.rmaki.tech {
-  reverse_proxy deluge:8112
+  reverse_proxy localhost:6467
 }
