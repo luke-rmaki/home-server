@@ -31,6 +31,22 @@ services:
       - 8081:8081
     restart: unless-stopped
 
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - DOCKER_MODS=linuxserver/mods:universal-calibre #optional
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
+    volumes:
+      - ./.cw:/config
+      - /.calibre/Calibre\ Library:/books
+    ports:
+      - 6468:8083
+    restart: unless-stopped
+
   filebrowser:
     container_name: filebrowser
     image: filebrowser/filebrowser
