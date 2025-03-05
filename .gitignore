@@ -7,3 +7,4 @@ test_download/
 .env
 .deluge/
 Files
+tf/env.tfvars

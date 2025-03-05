@@ -1,11 +1,21 @@
----
 services:
+  caddy:
+    image: caddy:2.9.1-alpine
+    restart: always
+    ports:
+      - 600:80
+      - 400:443
+    volumes:
+      - caddy-config:/config
+      - caddy-data:/data
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    networks:
+      - caddy_network
+
   syncthing:
     image: syncthing/syncthing
     container_name: syncthing
-    hostname: my-syncthing
-    ports:
-      - 6464:8385
+    hostname: syncthing
     environment:
       - PUID=1000
       - PGID=1000
@@ -13,6 +23,8 @@ services:
     volumes:
       - ./.st:/var/syncthing
     restart: unless-stopped
+    networks:
+      - caddy_network
 
   calibre:
     image: lscr.io/linuxserver/calibre:latest
@@ -26,11 +38,9 @@ services:
     volumes:
       - ${C_DIR}:/config
       - ${C_DIR}/Calibre Library:/books
-    ports:
-      - 6468:8080
-      - 8181:8181
-      - 8081:8081
     restart: unless-stopped
+    networks:
+      - caddy_network
 
   calibre-web:
     image: lscr.io/linuxserver/calibre-web:latest
@@ -43,9 +53,9 @@ services:
       - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
     volumes:
       - ./.cw:/config
-    ports:
-      - 6465:8083
     restart: unless-stopped
+    networks:
+      - caddy_network
 
   filebrowser:
     container_name: filebrowser
@@ -53,8 +63,8 @@ services:
     volumes:
       - ./Files:/srv
       - ./.fb/filebrowser.db:/database/filebrowser.db
-    ports:
-      - 6466:80
+    networks:
+      - caddy_network
 
   deluge:
     image: lscr.io/linuxserver/deluge:latest
@@ -67,10 +77,16 @@ services:
     volumes:
       - ./.deluge:/config
       - ${D_DIR}:/downloads
-    ports:
-      - 6467:8112
-      - 6881:6881
-      - 6881:6881/udp
-      - 58846:58846 #optional
     restart: unless-stopped
+    networks:
+      - caddy_network
+
+volumes:
+  caddy-config:
+  caddy-data:
+
+networks:
+  caddy_network:
+    driver: bridge
+
 
