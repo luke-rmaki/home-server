@@ -7,17 +7,48 @@
 
 ## Set up
 
-1. Clone this repo
-2. Run
+### Install Docker
+
+Set up APT repository
+
+```bash
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/raspbian/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/raspbian \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+```
+
+Install Docker:
+`sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin`
+
+---
+
+## Set up project
+
+- Clone this repo
+- Set up .env file.
+  - Set D_DIR to be a subpath of F_DIR to have downloaded files served by File Server
+- Run
 
 ```bash
 mkdir .fb
 touch .fb/filebrowser.db
+
+docker compose up -d
 ```
 
-# Instructions
+---
 
-## Install cloudflared
+### Install cloudflared
 
 ```bash
 # If brew installed
@@ -33,7 +64,7 @@ sudo apt-get update && sudo apt-get install cloudflared
 cloudflared tunnel login
 ```
 
-## Set up tunnel
+#### Set up tunnel
 
 ```bash
 cloudflared tunnel create my-tunnel
