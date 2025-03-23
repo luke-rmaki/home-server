@@ -1,3 +1,18 @@
-url: http://localhost:600
-tunnel: e73175e1-1e9d-428a-8834-87aa4db29c60
-credentials-file: /home/luke/.cloudflared/e73175e1-1e9d-428a-8834-87aa4db29c60.json
+tunnel: f87d6dc5-8c43-4eb8-bbc8-c0e0ae70bb31
+credentials-file: /etc/cloudflared/cred.json
+origincert: /etc/cloudflared/cert.pem
+
+ingress:
+  - hostname: syncthing.rmaki.tech
+    service: http://syncthing:8385
+  - hostname: calibre.rmaki.tech
+    service: http://calibre:8080
+  - hostname: lib.rmaki.tech
+    service: http://calibre-web:8083
+  - hostname: files.rmaki.tech
+    service: http://filebrowser:80
+  - hostname: deluge.rmaki.tech
+    service: http://deluged:8112
+  - service: http_status:404
+
+

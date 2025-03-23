@@ -1,10 +1,5 @@
 # Home Server
 
-- [x] Syncthing
-- [x] Calibre
-- [x] Deluge (for legitimate reasons only)
-- [x] File Browser
-
 ## Set up
 
 ### Install Docker
@@ -43,7 +38,6 @@ Install Docker:
 mkdir .fb
 touch .fb/filebrowser.db
 
-docker compose up -d
 ```
 
 ---
@@ -67,18 +61,35 @@ cloudflared tunnel login
 #### Set up tunnel
 
 ```bash
-cloudflared tunnel create my-tunnel
+cloudflared tunnel create home-server
 ```
 
-Create the config file:
+You'll need to delete any with the same name created previously
+
+Change this value in the [tunnel config file](tunnel.yml) to be the id of the tunnel created:
 
 ```yml
-url: http://localhost:8000cloudflared tunnel --config /path/your-config-file.yml run <UUID or NAME>
-tunnel: <Tunnel-UUID>
-credentials-file: /home/luke/.cloudflared/<Tunnel-UUID>.json
+tunnel: tunnel-id
 ```
 
+Change these lines in the [docker compose file](docker-compose.yml) to be wherever the files were created on the local machine
+
+```yml
+volumes:
+  - /home/luke/.cloudflared/tunnel-id.json:/etc/cloudflared/cred.json
+  - /home/luke/.cloudflared/cert.pem:/etc/cloudflared/cert.pem
+```
+
+Run
+
 ```bash
-cloudflared tunnel route dns <UUID or NAME> <hostname>
-cloudflared tunnel --config /path/your-config-file.yml run <UUID or NAME>
+chmod 644 /home/luke/.cloudflared/tunnel-id.json
+
+cloudflared tunnel route dns home-server syncthing.rmaki.tech
+cloudflared tunnel route dns home-server calibre.rmaki.tech
+cloudflared tunnel route dns home-server lib.rmaki.tech
+cloudflared tunnel route dns home-server files.rmaki.tech
+cloudflared tunnel route dns home-server deluge.rmaki.tech
+
+docker compose up -d
 ```

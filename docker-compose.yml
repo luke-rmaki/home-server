@@ -1,21 +1,10 @@
 services:
-  caddy:
-    image: caddy:2.9.1-alpine
-    restart: always
-    ports:
-      - 600:80
-      - 400:443
-    volumes:
-      - caddy-config:/config
-      - caddy-data:/data
-      - ./Caddyfile:/etc/caddy/Caddyfile
-    networks:
-      - caddy_network
-
   syncthing:
     image: syncthing/syncthing
     container_name: syncthing
     hostname: syncthing
+    ports:
+      - 6464:8385
     environment:
       - PUID=1000
       - PGID=1000
@@ -23,8 +12,7 @@ services:
     volumes:
       - ./.st:/var/syncthing
     restart: unless-stopped
-    networks:
-      - caddy_network
+
 
   calibre:
     image: lscr.io/linuxserver/calibre:latest
@@ -35,12 +23,15 @@ services:
       - TZ=Etc/UTC
       - PASSWORD=${C_PASS}
       - CUSTOM_USER=${C_USER}
+    ports:
+      - 6465:8080
+      - 8181:8181
+      - 8081:8081
     volumes:
       - ${C_DIR}:/config
       - ${C_DIR}/Calibre Library:/books
     restart: unless-stopped
-    networks:
-      - caddy_network
+
 
   calibre-web:
     image: lscr.io/linuxserver/calibre-web:latest
@@ -51,20 +42,21 @@ services:
       - TZ=Etc/UTC
       - DOCKER_MODS=linuxserver/mods:universal-calibre #optional
       - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
+    ports:
+      - 6468:8083
     volumes:
       - ./.cw:/config
     restart: unless-stopped
-    networks:
-      - caddy_network
 
   filebrowser:
     container_name: filebrowser
     image: filebrowser/filebrowser
+    ports:
+      - 6466:80
     volumes:
       - ./Files:/srv
       - ./.fb/filebrowser.db:/database/filebrowser.db
-    networks:
-      - caddy_network
+
 
   deluge:
     image: lscr.io/linuxserver/deluge:latest
@@ -74,19 +66,30 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
       - DELUGE_LOGLEVEL=error #optional
+    ports:
+      - 6467:8112
+      - 6881:6881
+      - 6881:6881/udp
+      - 58846:58846 #optional
     volumes:
       - ./.deluge:/config
       - ${D_DIR}:/downloads
     restart: unless-stopped
-    networks:
-      - caddy_network
 
-volumes:
-  caddy-config:
-  caddy-data:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
+    volumes:
+      - ./tunnel.yml:/etc/cloudflared/config.yaml
+      - /home/luke/.cloudflared/f87d6dc5-8c43-4eb8-bbc8-c0e0ae70bb31.json:/etc/cloudflared/cred.json
+      - /home/luke/.cloudflared/cert.pem:/etc/cloudflared/cert.pem
+    depends_on:
+      - syncthing
+      - calibre
+      - calibre-web
+      - filebrowser
+      - deluge
+    restart: unless-stopped
 
-networks:
-  caddy_network:
-    driver: bridge
 
 
