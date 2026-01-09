@@ -1,4 +1,4 @@
-tunnel: f87d6dc5-8c43-4eb8-bbc8-c0e0ae70bb31
+tunnel: 2da9e84b-d76b-4c39-ac8e-0f5fde6a21a8
 credentials-file: /etc/cloudflared/cred.json
 origincert: /etc/cloudflared/cert.pem
 
