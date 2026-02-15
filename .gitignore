@@ -1,11 +1,9 @@
-.calibre/
 .fb/
 .st/
-.cw/
 test_folder/
 test_download/
 .env
 .deluge/
-Files
-tf/env.tfvars
-Books/
+Files/
+jellyfin/
+Audiobookshelf/

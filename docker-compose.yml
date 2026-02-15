@@ -13,41 +13,6 @@ services:
       - ./.st:/var/syncthing
     restart: unless-stopped
 
-
-  calibre:
-    image: lscr.io/linuxserver/calibre:latest
-    container_name: calibre
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - PASSWORD=${C_PASS}
-      - CUSTOM_USER=${C_USER}
-    ports:
-      - 6465:8080
-      - 8181:8181
-      - 8081:8081
-    volumes:
-      - ${C_DIR}:/config
-      - ${C_DIR}/Calibre Library:/books
-    restart: unless-stopped
-
-
-  calibre-web:
-    image: lscr.io/linuxserver/calibre-web:latest
-    container_name: calibre-web
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - DOCKER_MODS=linuxserver/mods:universal-calibre #optional
-      - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
-    ports:
-      - 6468:8083
-    volumes:
-      - ./.cw:/config
-    restart: unless-stopped
-
   filebrowser:
     container_name: filebrowser
     image: filebrowser/filebrowser
@@ -56,7 +21,6 @@ services:
     volumes:
       - ./Files:/srv
       - ./.fb/filebrowser.db:/database/filebrowser.db
-
 
   deluge:
     image: lscr.io/linuxserver/deluge:latest
@@ -76,20 +40,70 @@ services:
       - ${D_DIR}:/downloads
     restart: unless-stopped
 
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    command: tunnel run
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    ports:
+      - 13378:80
     volumes:
-      - ./tunnel.yml:/etc/cloudflared/config.yaml
-      - /home/luke/.cloudflared/2da9e84b-d76b-4c39-ac8e-0f5fde6a21a8.json:/etc/cloudflared/cred.json
-      - /home/luke/.cloudflared/cert.pem:/etc/cloudflared/cert.pem
-    depends_on:
-      - syncthing
-      - calibre
-      - calibre-web
-      - filebrowser
-      - deluge
+      - ./Audiobookshelf/audiobooks/:/audiobooks
+      - ./Audiobookshelf/podcasts/:/podcasts
+      - ./Audiobookshelf/config/:/config
+      - ./Audiobookshelf/metadata/:/metadata
+    environment:
+      - TZ=Australia/Melbourne
+
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    ports:
+      - 8096:8096/tcp
+      - 7359:7359/udp
+    volumes:
+      - ./jellyfin/config/:/config
+      - ./jellyfin/cache/:/cache
+      - type: bind
+        source: ./jellyfin/media/
+        target: /media
+      - type: bind
+        source: ./jellyfin/media2/
+        target: /media2
+        read_only: true
+    restart: "unless-stopped"
+    # Optional - alternative address used for autodiscovery
+    # environment:
+    #   - JELLYFIN_PublishedServerUrl=http://example.com
+    # Optional - may be necessary for docker healthcheck to pass if running in host network mode
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  freshrss:
+    image: freshrss/freshrss:edge
+    container_name: freshrss
     restart: unless-stopped
+    logging:
+      options:
+        max-size: 10m
+    volumes:
+      # Recommended volume for FreshRSS persistent data such as configuration and SQLite databases
+      - data:/var/www/FreshRSS/data
+      # Optional volume for storing third-party extensions
+      - extensions:/var/www/FreshRSS/extensions
+    ports:
+      # If you want to open a port 8080 on the local machine:
+      - "8080:80"
+    environment:
+      TZ: Australia/Melbourne
+      # Cron job to refresh feeds at specified minutes
+      CRON_MIN: "2,32"
+    # Optional healthcheck
+    healthcheck:
+      test: ["CMD", "cli/health.php"]
+      timeout: 10s
+      start_period: 60s
+      start_interval: 11s
+      interval: 75s
+      retries: 3
 
-
-
+volumes:
+  data:
+  extensions:
